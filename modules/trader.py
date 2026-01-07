@@ -205,6 +205,12 @@ class Trader:
                 timeout=30,
                 verify=False  # SSL Verification deaktiviert (siehe Kommentar oben)
             )
+            
+            # DEBUG: Zeige HTTP Status und Response
+            logger.info(f"Jupiter Quote Response Status: {quote_response.status_code}")
+            logger.debug(f"Jupiter Quote Response Headers: {quote_response.headers}")
+            logger.debug(f"Jupiter Quote Raw Response: {quote_response.text[:500]}")
+            
             quote_response.raise_for_status()
             quote_data = quote_response.json()
             
