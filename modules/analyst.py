@@ -19,10 +19,15 @@ class Analyst:
     """
     
     def __init__(self):
-        self.client = OpenAI(
-            api_key=config.OPENROUTER_API_KEY,
-            base_url=config.OPENROUTER_BASE_URL
-        )
+        # OpenAI Client für OpenRouter (ohne proxies Parameter)
+        try:
+            self.client = OpenAI(
+                api_key=config.OPENROUTER_API_KEY,
+                base_url=config.OPENROUTER_BASE_URL
+            )
+        except Exception as e:
+            logger.error(f"Fehler beim Initialisieren des OpenAI Clients: {e}")
+            raise
         
         # Empfohlenes Modell für Trading-Analyse
         self.model = "anthropic/claude-3.5-sonnet"

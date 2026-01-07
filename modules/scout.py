@@ -49,11 +49,16 @@ class Scout:
             
             data = response.json()
             
-            if 'pairs' not in data:
+            if 'pairs' not in data or data['pairs'] is None:
                 logger.warning("Keine Pairs in API Response gefunden")
                 return []
             
             pairs = data['pairs']
+            
+            if pairs is None:
+                logger.warning("Pairs ist None - API hat keine Daten zurückgegeben")
+                return []
+            
             logger.info(f"Scout hat {len(pairs)} Pairs gefunden")
             
             # Filtere Pairs nach Kriterien
