@@ -21,6 +21,7 @@ import logging
 import time
 import sys
 from datetime import datetime
+import pytz
 import config
 from modules.scout import Scout
 from modules.analyst import Analyst
@@ -30,7 +31,23 @@ from modules.watcher import Watcher
 
 # Logging Setup
 def setup_logging():
-    """Konfiguriert das Logging System"""
+    """Konfiguriert das Logging System mit MEZ (Mitteleuropäische Zeit)"""
+    import logging
+    from datetime import datetime
+    import pytz
+    
+    # MEZ Timezone
+    mez = pytz.timezone('Europe/Berlin')
+    
+    class MEZFormatter(logging.Formatter):
+        """Custom Formatter für MEZ Zeitzone"""
+        def formatTime(self, record, datefmt=None):
+            dt = datetime.fromtimestamp(record.created, tz=mez)
+            if datefmt:
+                return dt.strftime(datefmt)
+            else:
+                return dt.strftime('%Y-%m-%d %H:%M:%S')
+    
     log_format = '%(asctime)s | %(levelname)-8s | %(name)-15s | %(message)s'
     date_format = '%Y-%m-%d %H:%M:%S'
     
@@ -38,16 +55,16 @@ def setup_logging():
     logger = logging.getLogger()
     logger.setLevel(getattr(logging, config.LOG_LEVEL))
     
-    # Console Handler
+    # Console Handler mit MEZ
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(getattr(logging, config.LOG_LEVEL))
-    console_handler.setFormatter(logging.Formatter(log_format, date_format))
+    console_handler.setFormatter(MEZFormatter(log_format, date_format))
     logger.addHandler(console_handler)
     
-    # File Handler
+    # File Handler mit MEZ
     file_handler = logging.FileHandler('bot.log', encoding='utf-8')
     file_handler.setLevel(logging.DEBUG)  # File bekommt alle Details
-    file_handler.setFormatter(logging.Formatter(log_format, date_format))
+    file_handler.setFormatter(MEZFormatter(log_format, date_format))
     logger.addHandler(file_handler)
     
     return logging.getLogger(__name__)
@@ -121,8 +138,13 @@ def main():
         
         while True:
             loop_counter += 1
+            
+            # MEZ Zeitstempel
+            mez = pytz.timezone('Europe/Berlin')
+            current_time = datetime.now(mez).strftime('%Y-%m-%d %H:%M:%S')
+            
             logger.info(f"\n{'='*70}")
-            logger.info(f"LOOP #{loop_counter} | {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+            logger.info(f"LOOP #{loop_counter} | {current_time} MEZ")
             logger.info(f"{'='*70}\n")
             
             try:

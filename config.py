@@ -37,7 +37,10 @@ MIN_AGE_MINUTES = 15
 MIN_VOLUME_USD = 10000
 
 # Jupiter Aggregator API
+# Primärer Endpoint (nutze IP falls DNS Problem)
 JUPITER_API_URL = "https://quote-api.jup.ag/v6"
+# Fallback: Nutze Jupiter Station Endpoint
+# JUPITER_API_URL = "https://station.jup.ag/api/v6"
 
 # DexScreener API
 DEXSCREENER_API_URL = "https://api.dexscreener.com/latest"
