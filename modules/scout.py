@@ -37,8 +37,9 @@ class Scout:
         try:
             logger.info("Scout startet DexScreener API Scan...")
             
-            # DexScreener API für neue Solana Pairs
-            url = f"{self.api_url}/dex/tokens/solana"
+            # DexScreener API - Latest Pairs für Solana
+            # Wir nutzen den "search" Endpoint mit Solana Chain Filter
+            url = f"{self.api_url}/dex/search?q=SOL"
             
             response = requests.get(
                 url,
@@ -59,10 +60,12 @@ class Scout:
                 logger.warning("Pairs ist None - API hat keine Daten zurückgegeben")
                 return []
             
-            logger.info(f"Scout hat {len(pairs)} Pairs gefunden")
+            # Filtere nur Solana Pairs
+            solana_pairs = [p for p in pairs if p.get('chainId') == 'solana']
+            logger.info(f"Scout hat {len(solana_pairs)} Solana Pairs gefunden (von {len(pairs)} total)")
             
             # Filtere Pairs nach Kriterien
-            filtered_pairs = self._filter_pairs(pairs)
+            filtered_pairs = self._filter_pairs(solana_pairs)
             
             logger.info(f"Scout hat {len(filtered_pairs)} Pairs nach Filterung übrig")
             
