@@ -143,9 +143,9 @@ def main():
             mez = pytz.timezone('Europe/Berlin')
             current_time = datetime.now(mez).strftime('%Y-%m-%d %H:%M:%S')
             
-            logger.info(f"\n{'='*70}")
+            logger.info("=" * 70)
             logger.info(f"LOOP #{loop_counter} | {current_time} MEZ")
-            logger.info(f"{'='*70}\n")
+            logger.info("=" * 70)
             
             try:
                 # SCHRITT 1: SCOUT - Finde neue Opportunities
@@ -157,25 +157,25 @@ def main():
                     time.sleep(config.SCOUT_INTERVAL)
                     continue
                 
-                logger.info(f"Scout hat {len(pairs)} Pairs gefunden\n")
+                logger.info(f"Scout hat {len(pairs)} Pairs gefunden")
                 
                 # SCHRITT 2: ANALYST - Analysiere mit KI
                 logger.info("🤖 SCHRITT 2: Analyst analysiert Pairs...")
                 recommended_pair = analyst.analyze_pairs(pairs)
                 
                 if not recommended_pair:
-                    logger.info("Analyst empfiehlt: PASS - Keine Trading Opportunity\n")
+                    logger.info("Analyst empfiehlt: PASS - Keine Trading Opportunity")
                     time.sleep(config.SCOUT_INTERVAL)
                     continue
                 
-                logger.info(f"Analyst empfiehlt: BUY {recommended_pair['symbol']}\n")
+                logger.info(f"Analyst empfiehlt: BUY {recommended_pair['symbol']}")
                 
                 # SCHRITT 3: TRADER - Führe Trade aus (mit Security Checks)
                 logger.info("💼 SCHRITT 3: Trader führt Trade aus...")
                 trade_result = trader.execute_trade(recommended_pair)
                 
                 if not trade_result:
-                    logger.warning("Trade wurde nicht ausgeführt (Security Check oder Fehler)\n")
+                    logger.warning("Trade wurde nicht ausgeführt (Security Check oder Fehler)")
                     time.sleep(config.SCOUT_INTERVAL)
                     continue
                 

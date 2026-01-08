@@ -209,10 +209,24 @@ class Trader:
             # DEBUG: Zeige HTTP Status und Response
             logger.info(f"Jupiter Quote Response Status: {quote_response.status_code}")
             logger.debug(f"Jupiter Quote Response Headers: {quote_response.headers}")
+            
+            # Prüfe ob Response leer ist
+            if not quote_response.text or quote_response.text.strip() == '':
+                logger.error("Jupiter API returned empty response")
+                logger.error(f"Request URL: {quote_url}")
+                logger.error(f"Request Params: {quote_params}")
+                return None
+            
             logger.debug(f"Jupiter Quote Raw Response: {quote_response.text[:500]}")
             
+            try:
+                quote_data = quote_response.json()
+            except ValueError as e:
+                logger.error(f"Jupiter API Response is not valid JSON: {e}")
+                logger.error(f"Raw Response: {quote_response.text[:1000]}")
+                return None
+            
             quote_response.raise_for_status()
-            quote_data = quote_response.json()
             
             if 'error' in quote_data:
                 logger.error(f"Jupiter Quote Error: {quote_data['error']}")
