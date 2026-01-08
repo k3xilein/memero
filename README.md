@@ -68,8 +68,11 @@ nano .env
 
 Fülle folgende Werte aus:
 - `SOLANA_PRIVATE_KEY`: Dein Base58 encoded Private Key
+- `JUPITER_API_KEY`: **NEU!** Kostenloser API Key von [Jupiter Portal](https://portal.jup.ag) (ERFORDERLICH)
 - `OPENROUTER_API_KEY`: Dein OpenRouter API Key
 - Optional: Passe Trading-Parameter an
+
+> **⚠️ WICHTIG:** Jupiter API v1 benötigt einen API Key! Registriere dich kostenlos auf https://portal.jup.ag
 
 5. **Bot starten**
 ```bash

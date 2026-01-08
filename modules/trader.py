@@ -184,7 +184,7 @@ class Trader:
             # Konvertiere SOL zu Lamports (1 SOL = 1_000_000_000 Lamports)
             amount_lamports = int(self.trade_amount_sol * 1_000_000_000)
             
-            # Schritt 1: Hole Quote von Jupiter
+            # Schritt 1: Hole Quote von Jupiter (API v1 requires API key)
             quote_url = f"{self.jupiter_api}/quote"
             quote_params = {
                 'inputMint': sol_mint,
@@ -193,15 +193,24 @@ class Trader:
                 'slippageBps': 50  # 0.5% Slippage
             }
             
+            # API Key Header (required by Jupiter API v1)
+            headers = {}
+            if config.JUPITER_API_KEY:
+                headers['x-api-key'] = config.JUPITER_API_KEY
+            else:
+                logger.warning("⚠️ JUPITER_API_KEY nicht gesetzt - API könnte fehlschlagen!")
+                logger.warning("   Hol dir einen API Key von: https://portal.jup.ag")
+            
             # WORKAROUND: SSL Verification deaktiviert für Jupiter API
-            # Grund: Server-seitige DNS/Certificate Probleme mit quote-api.jup.ag
+            # Grund: Server-seitige DNS/Certificate Probleme mit API
             # Jupiter ist eine bekannte, sichere API - verify=False ist hier akzeptabel
             import urllib3
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
             
             quote_response = requests.get(
                 quote_url, 
-                params=quote_params, 
+                params=quote_params,
+                headers=headers,
                 timeout=30,
                 verify=False  # SSL Verification deaktiviert (siehe Kommentar oben)
             )
@@ -259,7 +268,8 @@ class Trader:
             
             swap_response = requests.post(
                 swap_url, 
-                json=swap_payload, 
+                json=swap_payload,
+                headers=headers,  # API Key auch für Swap Request
                 timeout=30,
                 verify=False  # SSL Verification deaktiviert (siehe oben)
             )
