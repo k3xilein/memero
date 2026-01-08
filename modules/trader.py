@@ -217,13 +217,25 @@ class Trader:
                 logger.error(f"Request Params: {quote_params}")
                 return None
             
-            logger.debug(f"Jupiter Quote Raw Response: {quote_response.text[:500]}")
+            # Prüfe ob Response HTML ist (Fehler-Seite)
+            if quote_response.text.strip().startswith('<!doctype html>') or quote_response.text.strip().startswith('<html'):
+                logger.error("Jupiter API returned HTML instead of JSON (API down or wrong URL)")
+                logger.error(f"Request URL: {quote_url}")
+                logger.error(f"Possible reasons:")
+                logger.error("  1. Jupiter API endpoint changed or is down")
+                logger.error("  2. DNS redirect/man-in-the-middle")
+                logger.error("  3. Rate limiting or IP ban")
+                logger.error(f"HTML snippet: {quote_response.text[:200]}...")
+                return None
+            
+            logger.debug(f"Jupiter Quote Raw Response (first 200 chars): {quote_response.text[:200]}")
             
             try:
                 quote_data = quote_response.json()
             except ValueError as e:
                 logger.error(f"Jupiter API Response is not valid JSON: {e}")
-                logger.error(f"Raw Response: {quote_response.text[:1000]}")
+                logger.error(f"Response content type: {quote_response.headers.get('content-type', 'unknown')}")
+                logger.error(f"Raw Response (first 500 chars): {quote_response.text[:500]}")
                 return None
             
             quote_response.raise_for_status()
