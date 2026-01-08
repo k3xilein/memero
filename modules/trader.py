@@ -289,9 +289,8 @@ class Trader:
             transaction = VersionedTransaction.from_bytes(transaction_bytes)
             
             # Signiere VersionedTransaction korrekt
-            # VersionedTransaction hat keine .sign() Methode - wir müssen populate() verwenden
-            keypair = Keypair.from_bytes(self.wallet.secret_key)
-            signed_tx = VersionedTransaction.populate(transaction.message, [keypair])
+            # self.wallet ist bereits ein Keypair Objekt - direkt verwenden
+            signed_tx = VersionedTransaction.populate(transaction.message, [self.wallet])
             
             # Sende Transaction
             logger.info(f"Sende Swap Transaction für {symbol}...")
