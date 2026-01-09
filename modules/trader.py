@@ -264,7 +264,10 @@ class Trader:
                 'userPublicKey': str(self.wallet.pubkey()),
                 'wrapAndUnwrapSol': True,
                 'dynamicComputeUnitLimit': True,
-                'prioritizationFeeLamports': 'auto'
+                'prioritizationFeeLamports': 'auto',
+                'dynamicSlippage': {
+                    'maxBps': 300  # 3% max slippage (300 basis points)
+                }
             }
             
             swap_response = requests.post(
@@ -294,9 +297,14 @@ class Trader:
             # Der VersionedTransaction Constructor signiert automatisch!
             signed_tx = VersionedTransaction(transaction.message, [self.wallet])
             
-            # Sende Transaction
+            # Sende Transaction mit skipPreflight für schnellere Execution
             logger.info(f"Sende Swap Transaction für {symbol}...")
-            tx_response = self.rpc_client.send_transaction(signed_tx)
+            from solana.rpc.types import TxOpts
+            tx_opts = TxOpts(
+                skip_preflight=True,  # Überspringt Simulation - schneller aber risikoreicher
+                preflight_commitment="confirmed"
+            )
+            tx_response = self.rpc_client.send_transaction(signed_tx, opts=tx_opts)
             
             # tx_response.value ist bereits ein Signature Objekt
             signature = tx_response.value
