@@ -285,20 +285,13 @@ class Trader:
             
             # Decode Transaction
             import base64
-            from solders.hash import Hash
-            
             transaction_bytes = base64.b64decode(swap_transaction_b64)
             transaction = VersionedTransaction.from_bytes(transaction_bytes)
             
-            # Signiere die VersionedTransaction korrekt
-            # MessageV0 kann direkt in bytes konvertiert werden
-            serialized_msg = bytes(transaction.message)
-            
-            # Signiere die serialisierte Message
-            signature = self.wallet.sign_message(serialized_msg)
-            
-            # Erstelle signierte Transaction mit der Signature
-            signed_tx = VersionedTransaction.populate(transaction.message, [signature])
+            # Jupiter gibt uns eine unsigned Transaction
+            # Wir müssen sie neu erstellen und mit unserem Keypair signieren
+            # Der VersionedTransaction Constructor signiert automatisch!
+            signed_tx = VersionedTransaction(transaction.message, [self.wallet])
             
             # Sende Transaction
             logger.info(f"Sende Swap Transaction für {symbol}...")
