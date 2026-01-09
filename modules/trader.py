@@ -350,22 +350,27 @@ class Trader:
             float: Token Balance
         """
         try:
+            from solana.rpc.types import TokenAccountOpts
+            
             token_pubkey = Pubkey.from_string(token_address)
             
-            # Hole Token Accounts für Wallet
+            # Hole Token Accounts für Wallet mit jsonParsed encoding
             response = self.rpc_client.get_token_accounts_by_owner(
                 self.wallet.pubkey(),
-                {"mint": token_pubkey}
+                TokenAccountOpts(mint=token_pubkey),
+                encoding="jsonParsed"
             )
             
             if response.value:
-                # Parse Token Amount
+                # Parse Token Amount aus jsonParsed data
                 token_account = response.value[0]
-                amount_str = token_account.account.data.parsed['info']['tokenAmount']['uiAmount']
-                return float(amount_str)
+                parsed_data = token_account.account.data.parsed
+                amount = parsed_data['info']['tokenAmount']['uiAmount']
+                return float(amount) if amount is not None else 0.0
             
             return 0.0
             
         except Exception as e:
             logger.error(f"Fehler beim Abrufen der Token Balance: {e}")
+            logger.exception("Token Balance Error Details:")
             return 0.0
