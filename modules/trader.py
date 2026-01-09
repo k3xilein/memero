@@ -291,9 +291,8 @@ class Trader:
             transaction = VersionedTransaction.from_bytes(transaction_bytes)
             
             # Signiere die VersionedTransaction korrekt
-            # Wir müssen die serialisierte Message signieren
-            # Die Message muss mit dem aktuellen Blockhash versehen sein (schon in der Jupiter TX enthalten)
-            serialized_msg = bytes(transaction.message.serialize())
+            # MessageV0 kann direkt in bytes konvertiert werden
+            serialized_msg = bytes(transaction.message)
             
             # Signiere die serialisierte Message
             signature = self.wallet.sign_message(serialized_msg)
